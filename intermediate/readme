@@ -1,1 +1,5 @@
-
+Proses ETL dari tabel daftar_pegawai pada database stagingdb ke tabel
+1. daftar_resign
+2. daftar_employee
+3. daftar_new_hire
+di database inetermediatedb
