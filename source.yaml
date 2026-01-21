@@ -1,0 +1,137 @@
+version: 2
+
+sources:
+  - name: staging
+    database: stagingdb 
+    schema: public
+    tables:
+      - name: daftar_pegawai
+        description: Semua pegawai yang bekerja.
+        columns:
+          - name: nik_karyawan
+            description: Nomor Induk Karyawan yang merupakan identitas unik setiap pekerja.
+            data_type: varchar
+          - name: perusahaan
+            description: Nama entitas perusahaan atau anak perusahaan tempat karyawan terdaftar.
+            data_type: varchar
+          - name: hire_date
+            description: Tanggal resmi karyawan mulai bekerja di perusahaan.
+            data_type: date
+          - name: termination_date
+            description: Tanggal berakhirnya hubungan kerja karyawan, baik yang akan berakhir maupun yang telah berakhir.
+            data_type: date
+          - name: status
+            description: Status keaktifan karyawan.
+            data_type: varchar
+  
+  - name: intermediate
+    database: intermediatedb 
+    schema: public
+    tables:
+      - name: exist
+        description: list pegawai yang bekerja.
+        columns:
+          - name: nik
+            description: Nomor Induk Karyawan yang merupakan identitas unik setiap pekerja.
+            data_type: varchar
+          - name: company
+            description: Nama entitas perusahaan atau anak perusahaan tempat karyawan terdaftar.
+            data_type: varchar
+          - name: hire
+            description: Tanggal resmi karyawan mulai bekerja di perusahaan.
+            data_type: date
+          - name: termination
+            description: Tanggal berakhirnya hubungan kerja karyawan, baik yang akan berakhir maupun yang telah berakhir.
+            data_type: date
+          - name: status
+            description: Status keaktifan karyawan.
+            data_type: varchar
+	
+      - name: new_hire
+        description: list pegawai yang currently direkrut
+        columns:
+          - name: nik
+            description: Nomor Induk Karyawan yang merupakan identitas unik setiap pekerja.
+            data_type: varchar
+          - name: company
+            description: Nama entitas perusahaan atau anak perusahaan tempat karyawan terdaftar.
+            data_type: varchar
+          - name: hire
+            description: Tanggal resmi karyawan mulai bekerja di perusahaan.
+            data_type: date
+          - name: termination
+            description: Tanggal berakhirnya hubungan kerja karyawan, baik yang akan berakhir maupun yang telah berakhir.
+            data_type: date
+          - name: status
+            description: Status karyawan.
+            data_type: varchar
+
+      - name: resign
+        description: list pegawai yang sudah resign dengan data nik yang sudah tidak ada
+        columns:
+          - name: nik
+            description: Nomor Induk Karyawan yang merupakan identitas unik setiap pekerja.
+            data_type: varchar
+          - name: company
+            description: Nama entitas perusahaan atau anak perusahaan tempat karyawan terdaftar.
+            data_type: varchar
+          - name: hire
+            description: Tanggal resmi karyawan mulai bekerja di perusahaan.
+            data_type: date
+          - name: termination
+            description: Tanggal berakhirnya hubungan kerja karyawan, baik yang akan berakhir maupun yang telah berakhir.
+            data_type: date
+          - name: status
+            description: Status karyawan.
+            data_type: varchar
+
+  - name: hr_analytics
+    database: hranalyticdb 
+    schema: public
+    tables:
+      - name: headcount_change
+        description: Menghitung perubahan jumlah pegawai dari bulan ke bulan.
+        columns:
+          - name: tanggal
+            description: periode bulan ditulis dalam format tanggal di ISO 8601 dan selalu ditulis sebagai awal bulan
+            data_type: date
+          - name: num_resign
+            description: jumlah pegawai yang resign
+            data_type: integer
+          - name: num_new_hires
+            description: jumlah pegawai baru
+            data_type: integer
+          - name: cum_change
+            description: jumlah pegawai pada bulan tersebut setelah menghitung `num_resign` dan `num_new_hires`
+            data_type: integer
+	  - name: net_change
+            description: hasil kalkulasi `num_resign` dan `num_new_hires`
+            data_type: integer
+          - name: bouncing_hires
+            description: jumlah orang yang resign pada bulan yang sama saat direkrut
+            data_type: integer
+	  - name: previous_cum_change
+            description: nilai `cum_change` pada bulan sebelumnya
+            data_type: integer
+          - name: dim
+            description: kategorisasi periode waktu
+            data_type: text
+  
+      - name: retention_rate
+        description: Menghitung tingkat retensi pegawai bulanan dari analysis tabel headcount_change
+        columns:
+          - name: tanggal
+            description: periode bulan ditulis dalam format tanggal di ISO 8601 dan selalu ditulis sebagai awal bulan
+            data_type: date
+          - name: previous_cum_change
+            description: nilai `cum_change` pada bulan sebelumnya (lihat metrik `headcount_change`)
+            data_type: integer
+          - name: retaining
+            description: hasil kalkulasi `num_resign` dan `bouncing_hires` (lihat metrik `headcount_change`)
+            data_type: integer
+          - name: retention_rate
+            description: hasil kalkulasi `prev_cum_change` dan `retaining`
+            data_type: float
+          - name: dim
+            description: kategorisasi periode waktu
+            data_type: text
